@@ -45,19 +45,21 @@
 	        let selected_tire_size = 0;
 	        let selected_cadence = 0;
 	        const selected_sprocket_gears = [];
-			const selected_chain_wheel_gears = [];
+			const selected_chainwheel_gears = [];
 			let selected_mode = $('input[name="mode"]:checked').val();
+
+			let applyable = false;
 
 	        let html;
 
-			// タイヤサイズのリスト生成
+			// タイヤサイズのセレクトボックス生成
 	        {
                 html = '';
                 for(const grp_no in TIRE_PRESET){
                     html += `<optgroup label="${grp_no}">`;
                     for(const name in TIRE_PRESET[grp_no]){
                         const tire_size = TIRE_PRESET[grp_no][name];
-                        html += `<option value="${tire_size}">${name}</option>`
+                        html += `<option value="${tire_size}" data-group="${grp_no}" data-width="${name}">${name}</option>`
                     }
                     html += '</optgroup>';
                 }
@@ -86,7 +88,7 @@
                 $chainwheel_field.find('#chainwheel-ids').append(html);
 			}
 
-			// スプロケットの歯リストの生成
+			// スプロケットの歯セレクトボックスの生成
 	        {
                 html = '';
                 for(const grp_no in SPROCKET_PRESET){
@@ -95,8 +97,7 @@
                         const gears = SPROCKET_PRESET[grp_no][idx];
                         const min_gear = Math.min(...gears);
                         const max_gear = Math.max(...gears);
-                        const selected = (grp_no === '11' && idx === '2');
-                        html += `<option value="${gears.join(',')}" data-gear_count="${gears.length}" ${(selected) ? 'selected' : ''}>${min_gear}-${max_gear}T (${gears.join('-')}T)</option>`
+                        html += `<option value="${gears.join(',')}" data-group="${grp_no}" data-gear_count="${gears.length}" data-index="${idx}">${min_gear}-${max_gear}T (${gears.join('-')}T)</option>`
                     }
                     html += '</optgroup>';
                 }
@@ -114,7 +115,7 @@
 
                     html += '<div class="form-check form-check-inline">';
                     html += `  <input type="checkbox" name="sprocket_${i}" value="${i}" id="sprocket-${i}" class="form-check-input sprocket-gear-check">`;
-                    html += `  <label for="sprocket-${i}" class="form-check-label">${i.toString().padStart(2, '_')}T</label>\n`;
+                    html += `  <label for="sprocket-${i}" class="form-check-label">${i.toString().padStart(2, '_')}T</label>`;
                     html += '</div>';
 
                     if(i % 10 === 0){
@@ -125,79 +126,84 @@
                 $sprocket_field.find('#sprocket-ids').append(html);
 			}
 
-			const cadence_common = () => {
-				selected_tire_size = parseInt($('select[name="tire_variation"] option:selected').val());
-				selected_cadence = parseInt($('input[name="cadence"]').val());
-
-				apply_func();
-            };
-
 			const apply_func = () => {
-				console.log(selected_chain_wheel_gears, selected_sprocket_gears, selected_mode);
+				if(applyable){
+                    console.log(
+	                    selected_mode, selected_tire_size, selected_cadence,
+						selected_chainwheel_gears, selected_sprocket_gears
+                    );
 
-				$('input.input-result').val('');
+                    $('input.input-result').val('');
 
-				let unit = '';
-				switch(selected_mode){
-                    case 'ratio':
-						unit = 'Rtt.';
-						break;
-                    case 'kph':
-						unit = 'Km/h';
-						break;
-                }
-				$('span.result-unit').text(unit);
-
-				if(selected_chain_wheel_gears.length > 0 && selected_sprocket_gears.length > 0){
-                    for(const idx in selected_chain_wheel_gears){
-                        const row = parseInt(idx) + 1;
-                        $(`input#cw-tooth-${row}`).val(selected_chain_wheel_gears[idx]);
-                        $(`tr.result-row-${row}`).show();
+                    let unit = '';
+                    switch(selected_mode){
+                        case 'ratio':
+                            unit = 'Rtt.';
+                            break;
+                        case 'kph':
+                            unit = 'Km/h';
+                            break;
                     }
-                    for(let i = selected_chain_wheel_gears.length; i < 3; i++){
-                        const row = i + 1;
-                        $(`tr.result-row-${row}`).hide();
-                    }
+                    $('span.result-unit').text(unit);
 
-                    for(const idx in selected_sprocket_gears){
-                        const col = parseInt(idx) + 1;
-                        $(`input#sp-tooth-${col}`).val(selected_sprocket_gears[idx]);
-                        $(`.result-col-${col}`).show();
-                    }
-                    for(let i = selected_sprocket_gears.length; i < SPROCKET_S_MAX; i++){
-                        const col = i + 1;
-                        $(`.result-col-${col}`).hide();
-                    }
+                    if(selected_chainwheel_gears.length > 0 && selected_sprocket_gears.length > 0){
+                        for(const idx in selected_chainwheel_gears){
+                            const row = parseInt(idx) + 1;
+                            $(`input#cw-tooth-${row}`).val(selected_chainwheel_gears[idx]);
+                            $(`tr.result-row-${row}`).show();
+                        }
+                        for(let i = selected_chainwheel_gears.length; i < 3; i++){
+                            const row = i + 1;
+                            $(`tr.result-row-${row}`).hide();
+                        }
 
-					for(const r_idx in selected_chain_wheel_gears){
-						const row = parseInt(r_idx) + 1;
-						const cw_gear = selected_chain_wheel_gears[r_idx];
-						for(const c_idx in selected_sprocket_gears){
-							const col = parseInt(c_idx) + 1;
-							const sp_gear = selected_sprocket_gears[c_idx];
+                        for(const idx in selected_sprocket_gears){
+                            const col = parseInt(idx) + 1;
+                            $(`input#sp-tooth-${col}`).val(selected_sprocket_gears[idx]);
+                            $(`.result-col-${col}`).show();
+                        }
+                        for(let i = selected_sprocket_gears.length; i < SPROCKET_S_MAX; i++){
+                            const col = i + 1;
+                            $(`.result-col-${col}`).hide();
+                        }
 
-							const ratio = cw_gear / sp_gear;
+                        for(const r_idx in selected_chainwheel_gears){
+                            const row = parseInt(r_idx) + 1;
+                            const cw_gear = selected_chainwheel_gears[r_idx];
+                            for(const c_idx in selected_sprocket_gears){
+                                const col = parseInt(c_idx) + 1;
+                                const sp_gear = selected_sprocket_gears[c_idx];
 
-							let kmh = 0;
-							if(selected_tire_size > 0 && selected_cadence > 0){
-								kmh = (selected_tire_size / 1000000) * (selected_cadence * 60 * ratio);
+                                const ratio = cw_gear / sp_gear;
+
+                                let kmh = 0;
+                                if(selected_tire_size > 0 && selected_cadence > 0){
+                                    kmh = (selected_tire_size / 1000000) * (selected_cadence * 60 * ratio);
+                                }
+
+                                let result = 0;
+                                switch(selected_mode){
+                                    case 'ratio':
+                                        result = ratio;
+                                        break;
+                                    case 'kph':
+                                        result = kmh;
+                                        break;
+                                }
+
+                                $(`input#result-${row}-${col}`).val(Math.round(result * 100) / 100);
                             }
-
-							let result = 0;
-							switch(selected_mode){
-								case 'ratio':
-									result = ratio;
-									break;
-								case 'kph':
-									result = kmh;
-									break;
-							}
-
-							$(`input#result-${row}-${col}`).val(Math.round(result * 100) / 100);
                         }
                     }
 				}
             };
+
+	        const cadence_common = () => {
+		        selected_tire_size = parseInt($('select[name="tire_variation"] option:selected').val());
+		        selected_cadence = parseInt($('input[name="cadence"]').val());
+
+                apply_func();
+	        };
 
 			//
 	        $('select[name="tire_variation"]').on('change', cadence_common);
@@ -205,8 +211,38 @@
 			//
 	        $('input[name="cadence"]').on('change', cadence_common);
 
+	        //
+	        $('input.chainwheel-gear-check').on('change', function(){
+		        const check_count = $('input.chainwheel-gear-check:checked').length;
+		        if(check_count < 1 || check_count > 3){
+			        $(this).prop('checked', (check_count < 1));
+
+			        window.alert("選択数が不正");
+		        }
+
+		        //
+		        selected_chainwheel_gears.splice(0);
+
+		        const gears = [];
+		        $('input.chainwheel-gear-check:checked').each((idx, elem) => {
+			        const int_val = parseInt($(elem).val());
+			        if(!isNaN(int_val))
+				        gears.push(int_val);
+		        });
+		        gears.sort((x, y) => x - y);
+
+		        for(const gear of gears){
+			        selected_chainwheel_gears.push(gear);
+		        }
+		        selected_chainwheel_gears.sort((x, y) => x - y);
+
+		        apply_func();
+	        });
+
 			//
             $('select[name="sprocket_variation"]').change(function(){
+				applyable = false;
+
 				const $sprocket_gear_checkbox = $('input.sprocket-gear-check');
 				const val = $(this).find('option:selected').val();
 
@@ -236,7 +272,9 @@
 
 					selected_sprocket_gears.sort((x, y) => x - y);
 
-					apply_func();
+					applyable = true;
+
+                    apply_func();
                 }
             });
 
@@ -244,7 +282,7 @@
 	        $('input.sprocket-gear-check').on('change', function(){
 				const check_count = $('input.sprocket-gear-check:checked').length;
 				if(check_count < 1 || check_count > SPROCKET_S_MAX){
-					$(this).prop('checked', false);
+					$(this).prop('checked', (check_count < 1));
 
 					window.alert("選択数が不正");
 				}
@@ -280,27 +318,33 @@
                 }
 		        selected_sprocket_gears.sort((x, y) => x - y);
 
-				apply_func();
+                apply_func();
             });
 
 			//
             $('input[name="mode"]').change(() => {
 				selected_mode = $('input[name="mode"]:checked').val();
 
-				apply_func();
+				if(selected_mode === 'kph')
+					$('#cadence-field').show(100);
+				else
+					$('#cadence-field').hide(100);
+
+                apply_func();
             });
 
 			for(const gear of CHAIN_WHEEL_PRESET['2'][0]){
-				selected_chain_wheel_gears.push(gear);
+				selected_chainwheel_gears.push(gear);
             }
 
-			//
-            html = '';
+			// 結果表の生成
 	        {
+                html = '';
+
 				html += '<table class="table">';
 				html += '  <thead>';
 				html += '    <tr>';
-				html += '      <th></th>';
+				html += '      <th style="width: 100px;"></th>';
 				for(let i = 1; i <= SPROCKET_S_MAX; i++){
 					html += `<th class="result-col-${i}">${i}速</th>`;
                 }
@@ -347,6 +391,14 @@
 				$('div#result-table-field').append(html);
             }
 
+			// デフォルト値の設定
+            $('select[name="tire_variation"]').find('option[data-group="700"][data-width="28c"]').prop('selected', true).change();
+			$('input.chainwheel-gear-check[value="34"]').prop('checked', true);
+			$('input.chainwheel-gear-check[value="50"]').prop('checked', true);
+			$('select[name="sprocket_variation"]').find('option[data-group="11"][data-index="2"]').prop('selected', true).change();
+
+	        applyable = true;
+
 			apply_func();
         })
     </script>
@@ -372,7 +424,7 @@
         </div>
     </div>
 
-    <div id="cadence-field" class="card mt-3">
+    <div id="cadence-field" class="card mt-3" style="display: none;">
         <div class="card-header">タイヤサイズ・ケイデンス</div>
         <div class="card-body">
             <div class="row">
