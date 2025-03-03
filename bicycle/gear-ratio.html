@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-100">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="index,follow" />
+    <meta name="keywords" content="自転車,bicycle,スプロケット,チェーンリング,ケイデンス," />
+
+    <title>Bicycle gear retio</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" />
+
+    <link href="../favicon.ico" type="image/x-icon" rel="icon">
+    <link href="../favicon.ico" type="image/x-icon" rel="shortcut icon">
+
+    <script>
+        $(() => {
+			const CHAIN_WHEEL_PRESET = {
+				1: [],
+                2: [
+					[34, 50],
+                ]
+            };
+
+			const SPROCKET_PRESET = {
+				 7: [
+					 [11, 13, 15, 18, 21, 24, 28],
+					 [12, 14, 16, 18, 21, 24, 28],
+                     [12, 14, 16, 18, 21, 26, 32]
+                 ],
+				 8: [
+					 [11, 13, 15, 17, 19, 21, 24, 28],
+					 [11, 13, 15, 17, 20, 23, 26, 30],
+                     [11, 13, 15, 18, 21, 24, 28, 32],
+                     [11, 13, 15, 17, 20, 23, 26, 34],
+                     [12, 13, 14, 15, 17, 19, 21, 23],
+                     [12, 13, 15, 17, 19, 21, 23, 25],
+					 [12, 14, 16, 18, 21, 24, 28, 32],
+                     [13, 14, 15, 17, 19, 21, 23, 26]
+                 ],
+				 9: [
+					 [ 9, 10, 11, 13, 15, 17, 20, 23, 26],
+					 [11, 12, 13, 14, 16, 18, 21, 24, 28],
+					 [11, 12, 14, 16, 18, 21, 24, 28, 32],
+                     [11, 13, 15, 17, 20, 23, 26, 30, 34],
+                     [12, 13, 14, 15, 16, 17, 19, 21, 23],
+                     [13, 14, 15, 16, 17, 19, 21, 23, 25],
+                     [14, 15, 16, 17, 18, 19, 21, 23, 25]
+                 ],
+				10: [
+					[11, 12, 13, 14, 15, 16, 17, 19, 21, 23],
+                    [11, 12, 13, 14, 15, 17, 19, 21, 23, 25],
+                    [11, 12, 13, 14, 15, 17, 19, 21, 24, 27],
+                    [11, 12, 13, 14, 15, 17, 19, 21, 24, 28],
+					[11, 12, 14, 16, 18, 20, 22, 25, 28, 32],
+                    [11, 13, 15, 17, 19, 21, 23, 26, 30, 34],
+                    [11, 13, 15, 17, 19, 21, 24, 28, 32, 36],
+                    [11, 13, 15, 18, 21, 24, 28, 32, 37, 42],
+                    [12, 13, 14, 15, 16, 17, 18, 19, 21, 23],
+                    [12, 13, 14, 15, 16, 17, 19, 21, 23, 25],
+                    [12, 13, 14, 15, 16, 17, 19, 21, 24, 27],
+                    [12, 13, 14, 15, 17, 19, 21, 23, 25, 28],
+                    [12, 13, 14, 15, 17, 19, 21, 24, 27, 30],
+                    [13, 14, 15, 16, 17, 18, 19, 21, 23, 25],
+                    [14, 15, 16, 17, 18, 19, 20, 21, 23, 25],
+                    [15, 16, 17, 18, 19, 20, 21, 22, 23, 25],
+                    [16, 17, 18, 19, 20, 21, 22, 23, 25, 27]
+                ],
+                11: [
+					[11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23],
+                    [11, 12, 13, 14, 15, 16, 17, 19, 21, 23, 25],
+	                [11, 12, 13, 14, 15, 17, 19, 21, 23, 25, 28],
+                    [11, 12, 13, 14, 15, 17, 19, 21, 24, 27, 30],
+                    [11, 12, 13, 14, 16, 18, 20, 22, 25, 28, 32],
+                    [11, 13, 15, 17, 19, 21, 23, 25, 27, 30, 34],
+                    [11, 13, 15, 17, 19, 21, 24, 27, 31, 35, 40],
+                    [11, 13, 15, 17, 19, 21, 24, 28, 32, 37, 42],
+                    [11, 13, 15, 17, 19, 21, 24, 28, 32, 37, 46],
+                    [12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25],
+                    [12, 13, 14, 15, 16, 17, 19, 21, 23, 25, 28],
+                    [14, 15, 16, 17, 18, 19, 20, 21, 23, 25, 28]
+                ],
+				12: [
+					[10, 12, 14, 16, 18, 21, 24, 28, 32, 36, 40, 45],
+                    [10, 12, 14, 16, 18, 21, 24, 28, 33, 39, 45, 51],
+                    [11, 12, 13, 14, 15, 16, 17, 19, 21, 24, 27, 30],
+                    [11, 12, 13, 14, 15, 17, 19, 21, 24, 27, 30, 34],
+                    [11, 12, 13, 14, 15, 17, 19, 21, 24, 28, 32, 36]
+                ],
+            };
+
+			const TIRE_PRESET = {
+				700: {
+					'18c': 2070,
+					'19c': 2080,
+					'20c': 2086,
+					'23c': 2096,
+					'25c': 2105,
+					'28c': 2136,
+					'30c': 2146,
+					'32c': 2155,
+					'35c': 2168,
+					'38c': 2180,
+					'40c': 2220,
+					'42c': 2224,
+					'44c': 2235,
+					'45c': 2242,
+					'47c': 2268,
+                }
+            };
+
+			const SPROCKET_S_MIN = Math.min(...Object.keys(SPROCKET_PRESET).map((v) => parseInt(v)));
+			const SPROCKET_S_MAX = Math.max(...Object.keys(SPROCKET_PRESET).map((v) => parseInt(v)));
+			const SPROCKET_T_MIN = Math.min(...Object.values(SPROCKET_PRESET).map((v) => Math.min(...v.map((vv) => Math.min(...vv)))));
+			const SPROCKET_T_MAX = Math.max(...Object.values(SPROCKET_PRESET).map((v) => Math.max(...v.map((vv) => Math.max(...vv)))));
+
+			const $cadence_field = $('#cadence-field');
+			const $sprocket_field = $('#sprocket-field');
+
+	        let selected_tire_size = 0;
+	        let selected_cadence = 0;
+	        const selected_sprocket_gears = [];
+			const selected_chain_wheel_gears = [];
+			let selected_mode = $('input[name="mode"]:checked').val();
+
+	        let html;
+
+			html = '';
+			for(const grp_no in TIRE_PRESET){
+				html += `<optgroup label="${grp_no}">`;
+				for(const name in TIRE_PRESET[grp_no]){
+					const tire_size = TIRE_PRESET[grp_no][name];
+					html += `<option value="${tire_size}">${name}</option>`
+                }
+				html += '</optgroup>';
+            }
+
+	        $cadence_field.find('select[name="tire_variation"]').prepend(html);
+
+			html = '';
+			for(const grp_no in SPROCKET_PRESET){
+				html += `<optgroup label="${grp_no}S">`;
+				for(const idx in SPROCKET_PRESET[grp_no]){
+					const gears = SPROCKET_PRESET[grp_no][idx];
+					const min_gear = Math.min(...gears);
+					const max_gear = Math.max(...gears);
+					const selected = (grp_no === '11' && idx === '2');
+					html += `<option value="${gears.join(',')}" data-gear_count="${gears.length}" ${(selected) ? 'selected' : ''}>${min_gear}-${max_gear}T (${gears.join('-')}T)</option>`
+                }
+				html += '</optgroup>';
+            }
+
+	        $sprocket_field.find('select[name="sprocket-variation"]').prepend(html);
+
+			html = '';
+			for(let i = SPROCKET_T_MIN, c = 0; i <= SPROCKET_T_MAX; i++, c++){
+				if((c === 0 && SPROCKET_T_MIN % 10 !== 1) || i % 10 === 1){
+					html += '<div>';
+                }
+
+				html += '<div class="form-check form-check-inline">';
+				html += `  <input type="checkbox" name="mode" value="${i}" id="sprocket-${i}" class="form-check-input gear-check">`;
+				html += `  <label for="sprocket-${i}" class="form-check-label">${i.toString().padStart(2, '_')}T</label>\n`;
+                html += '</div>';
+
+				if(i % 10 === 0){
+					html += '</div>';
+				}
+            }
+
+	        $sprocket_field.find('#sprocket-ids').append(html);
+
+			const cadence_common = () => {
+				selected_tire_size = parseInt($('select[name="tire_variation"] option:selected').val());
+				selected_cadence = parseInt($('input[name="cadence"]').val());
+
+				apply_func();
+            };
+
+			const apply_func = () => {
+				console.log(selected_chain_wheel_gears, selected_sprocket_gears, selected_mode);
+
+				$('input.input-result').val('');
+
+				let unit = '';
+				switch(selected_mode){
+                    case 'ratio':
+						unit = 'Rtt.';
+						break;
+                    case 'kph':
+						unit = 'Km/h';
+						break;
+                }
+				$('span.result-unit').text(unit);
+
+				if(selected_chain_wheel_gears.length > 0 && selected_sprocket_gears.length > 0){
+                    for(const idx in selected_chain_wheel_gears){
+                        const row = parseInt(idx) + 1;
+                        $(`input#cw-tooth-${row}`).val(selected_chain_wheel_gears[idx]);
+                        $(`tr.result-row-${row}`).show();
+                    }
+                    for(let i = selected_chain_wheel_gears.length; i < 3; i++){
+                        const row = i + 1;
+                        $(`tr.result-row-${row}`).hide();
+                    }
+
+                    for(const idx in selected_sprocket_gears){
+                        const col = parseInt(idx) + 1;
+                        $(`input#sp-tooth-${col}`).val(selected_sprocket_gears[idx]);
+                        $(`.result-col-${col}`).show();
+                    }
+                    for(let i = selected_sprocket_gears.length; i < SPROCKET_S_MAX; i++){
+                        const col = i + 1;
+                        $(`.result-col-${col}`).hide();
+                    }
+
+					for(const r_idx in selected_chain_wheel_gears){
+						const row = parseInt(r_idx) + 1;
+						const cw_gear = selected_chain_wheel_gears[r_idx];
+						for(const c_idx in selected_sprocket_gears){
+							const col = parseInt(c_idx) + 1;
+							const sp_gear = selected_sprocket_gears[c_idx];
+
+							const ratio = Math.round(cw_gear / sp_gear * 100) / 100;
+
+							let kmh = 0;
+							if(selected_tire_size > 0 && selected_cadence > 0){
+								kmh = (selected_tire_size / 1000000) * (selected_cadence * 60 * ratio);
+								kmh = Math.round(kmh * 100) / 100;
+                            }
+							console.log(selected_tire_size, selected_cadence, kmh);
+
+							let result = 0;
+							switch(selected_mode){
+								case 'ratio':
+									result = ratio;
+									break;
+								case 'kph':
+									result = kmh;
+									break;
+							}
+
+							$(`input#result-${row}-${col}`).val(result);
+                        }
+                    }
+				}
+            };
+
+			//
+	        $('select[name="tire_variation"]').on('change', cadence_common);
+
+			//
+	        $('input[name="cadence"]').on('change', cadence_common);
+
+			//
+            $('select[name="sprocket_variation"]').change(function(){
+				const $gear_checkbox = $('input.gear-check');
+				const val = $(this).find('option:selected').val();
+
+				//
+				selected_sprocket_gears.splice(0);
+
+				if(val !== undefined && val !== ''){
+					const selected_gears = val.split(',');
+					const org_len = selected_gears.length;
+
+					$gear_checkbox.prop('checked', false);
+
+					let c = 0;
+					for(const gear of selected_gears.map((v) => parseInt(v))){
+						if(!isNaN(gear)){
+							$(`input.gear-check[value="${gear}"]`).prop('checked', true);
+
+							selected_sprocket_gears.push(gear);
+
+							c++;
+                        }
+                    }
+
+					if(org_len !== c){
+						$gear_checkbox.prop('checked', false);
+                    }
+
+					selected_sprocket_gears.sort((x, y) => x - y);
+
+					apply_func();
+                }
+            });
+
+			//
+	        $('input.gear-check').on('change', function(){
+				const check_count = $('input.gear-check:checked').length;
+				if(check_count < 1 || check_count > SPROCKET_S_MAX){
+					$(this).prop('checked', false);
+
+					window.alert("選択数が不正");
+				}
+
+				//
+		        selected_sprocket_gears.splice(0);
+
+		        $('select[name="sprocket_variation"] option').prop('selected', false);
+
+		        const gears = [];
+				$('input.gear-check:checked').each((idx, elem) => {
+					const int_val = parseInt($(elem).val());
+					if(!isNaN(int_val))
+						gears.push(int_val);
+                });
+				gears.sort((x, y) => x - y);
+
+				let sel_val = '';
+				if(SPROCKET_PRESET[gears.length]){
+					const gears_str = gears.join(',');
+					for(const preset_gears of SPROCKET_PRESET[gears.length]){
+						if(preset_gears.join(',') === gears_str){
+							sel_val = gears_str;
+							break;
+						}
+                    }
+                }
+
+		        $(`select[name="sprocket_variation"] option[value="${sel_val}"]`).prop('selected', true);
+
+				for(const gear of gears){
+					selected_sprocket_gears.push(gear);
+                }
+		        selected_sprocket_gears.sort((x, y) => x - y);
+
+				apply_func();
+            });
+
+			//
+            $('input[name="mode"]').change(() => {
+				selected_mode = $('input[name="mode"]:checked').val();
+
+				apply_func();
+            });
+
+			for(const gear of CHAIN_WHEEL_PRESET['2'][0]){
+				selected_chain_wheel_gears.push(gear);
+            }
+
+			//
+            html = '';
+	        {
+				html += '<table class="table">';
+				html += '  <thead>';
+				html += '    <tr>';
+				html += '      <th></th>';
+				for(let i = 1; i <= SPROCKET_S_MAX; i++){
+					html += `<th class="result-col-${i}">${i}速</th>`;
+                }
+				html += '    </tr>';
+
+		        html += '    <tr>';
+		        html += '      <th></th>';
+		        for(let i = 1; i <= SPROCKET_S_MAX; i++){
+			        html += `<th class="result-col-${i}">`;
+					html += '  <div class="input-group">';
+					html +=	`    <input type="text" name="sp_tooth_${i}" id="sp-tooth-${i}" class="form-control small text-right input-sp-tooth" readonly />`;
+			        html += '    <span class="input-group-text s-unit">T</span>';
+                    html += '  </div>'
+					html += '</th>';
+		        }
+		        html += '    </tr>';
+				html += '  </thead>';
+
+				html += '  <tbody>';
+				for(let i = 1; i <= 3; i++){
+					html += `<tr class="result-row-${i}">`;
+
+					html += `  <th class="cw-${i}">`;
+					html += '    <div class="input-group">';
+					html +=	`      <input type="text" name="cw_tooth_${i}" id="cw-tooth-${i}" class="form-control small text-right input-cw-tooth" readonly />`;
+					html += '      <span class="input-group-text s-unit">T</span>';
+					html += '    </div>'
+					html += '  </th>';
+
+					for(let j = 1; j <= SPROCKET_S_MAX; j++){
+						html += `<td class="result-col-${j}">`;
+						html += '  <div class="input-group">';
+						html +=	`    <input type="text" name="result_${i}_${j}" id="result-${i}-${j}" class="form-control small text-right input-result" readonly />`;
+						html += '    <span class="input-group-text result-unit"></span>';
+						html += '  </div>'
+						html += '</td>';
+					}
+					html += '    </tr>';
+                }
+				html += '  </tbody>';
+
+				html += '</table>';
+
+				$('div#result-table-field').append(html);
+            }
+
+			apply_func();
+        })
+    </script>
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="card mt-3 mode-field">
+        <div class="card-header">表示モード</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" name="mode" value="ratio" id="mode_ratio" class="form-check-input" checked>
+                        <label for="mode_ratio" class="form-check-label">回転比</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" name="mode" value="kph" id="mode_kph" class="form-check-input">
+                        <label for="mode_kph" class="form-check-label">速度</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cadence-field" class="card mt-3">
+        <div class="card-header">タイヤサイズ・ケイデンス</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <label for="tire_variation">タイヤサイズ</label>
+                    <select name="tire_variation" id="tire_variation" class="form-select"></select>
+                </div>
+
+                <div class="col-6">
+                    <label for="cadence">ケイデンス</label>
+                    <div class="input-group">
+                        <input type="number" name="cadence" value="90" min="1" max="255" id="cadence" class="form-control" />
+                        <span class="input-group-text">rpm.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chain-wheel-field" class="card mt-3">
+        <div class="card-header">チェーンリング</div>
+        <div class="card-body">
+            <div id="chain-wheel-ids" class="mt-2"></div>
+        </div>
+    </div>
+
+    <div id="sprocket-field" class="card mt-3">
+        <div class="card-header">スプロケット</div>
+        <div class="card-body">
+            <div>
+                <label for="sprocket-variation">歯数構成</label>
+                <select name="sprocket_variation" id="sprocket-variation" class="form-select">
+                    <optgroup label="その他">
+                        <option value="">その他</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div id="sprocket-ids" class="mt-2"></div>
+        </div>
+    </div>
+
+    <div id="result-table-field"></div>
+</div>
+</body>
+</html>
