@@ -4,9 +4,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index,follow" />
-    <meta name="keywords" content="自転車,bicycle,スプロケット,チェーンリング,ケイデンス," />
+    <meta name="keywords" content="自転車,bicycle,スプロケット,チェーンリング,ケイデンス,Sprocket,Chain Wheel" />
 
-    <title>Bicycle gear retio</title>
+    <title>Bicycle gear ratio</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
@@ -23,33 +23,35 @@
 
     <script>
         $(() => {
-			const CHAIN_WHEEL_PRESET = {
-				1: [],
-                2: [
-					[34, 50],
-                ]
-            };
-
-	        const SPROCKET_PRESET = window.SPROCKET_PRESET;
+	        // スプロケットプリセット
+			const SPROCKET_PRESET = window.SPROCKET_PRESET;
+	        // タイヤサイズプリセット
 			const TIRE_PRESET = window.TIRE_PRESET;
 
+			// スプロケット 最小歯数構成数 / 最大歯数構成数
 			const SPROCKET_S_MIN = Math.min(...Object.keys(SPROCKET_PRESET).map((v) => parseInt(v)));
 			const SPROCKET_S_MAX = Math.max(...Object.keys(SPROCKET_PRESET).map((v) => parseInt(v)));
+	        // スプロケット 最小歯数 / 最大歯数
 			const SPROCKET_T_MIN = Math.min(...Object.values(SPROCKET_PRESET).map((v) => Math.min(...v.map((vv) => Math.min(...vv)))));
 			const SPROCKET_T_MAX = Math.max(...Object.values(SPROCKET_PRESET).map((v) => Math.max(...v.map((vv) => Math.max(...vv)))));
 
+			// 各設定セレクター
+			const $mode_field = $('#mode-field');
 			const $cadence_field = $('#cadence-field');
 			const $chainwheel_field = $('#chainwheel-field');
 			const $sprocket_field = $('#sprocket-field');
 
+			// 表計算で使用する変数群
 	        let selected_tire_size = 0;
 	        let selected_cadence = 0;
+	        const selected_chainwheel_gears = [];
 	        const selected_sprocket_gears = [];
-			const selected_chainwheel_gears = [];
-			let selected_mode = $('input[name="mode"]:checked').val();
+			let selected_mode = 'ratio';
 
+			// 表反映可能フラグ
 			let applyable = false;
 
+			// HTMLタグ生成用バッファー(的なやつ)
 	        let html;
 
 			// タイヤサイズのセレクトボックス生成
@@ -88,7 +90,7 @@
                 $chainwheel_field.find('#chainwheel-ids').append(html);
 			}
 
-			// スプロケットの歯セレクトボックスの生成
+			// スプロケットの歯数構成セレクトボックスの生成
 	        {
                 html = '';
                 for(const grp_no in SPROCKET_PRESET){
@@ -126,8 +128,12 @@
                 $sprocket_field.find('#sprocket-ids').append(html);
 			}
 
+	        /**
+             * 設定値から計算、表に反映するサブファンクション
+	         */
 			const apply_func = () => {
 				if(applyable){
+					// ログ
                     console.log(
 	                    selected_mode, selected_tire_size, selected_cadence,
 						selected_chainwheel_gears, selected_sprocket_gears
@@ -198,20 +204,37 @@
 				}
             };
 
+	        /**
+             * タイヤサイズ・ケイデンスの設定値変更時の共通サブファンクション
+	         */
 	        const cadence_common = () => {
 		        selected_tire_size = parseInt($('select[name="tire_variation"] option:selected').val());
 		        selected_cadence = parseInt($('input[name="cadence"]').val());
 
+		        // 表に適用
                 apply_func();
 	        };
 
-			//
+	        // 表示モードラジオボタン操作のトリガー
+	        $('input[name="mode"]').change(() => {
+		        selected_mode = $('input[name="mode"]:checked').val();
+
+		        if(selected_mode === 'kph')
+			        $('#cadence-field').show(100);
+		        else
+			        $('#cadence-field').hide(100);
+
+		        // 表に適用
+		        apply_func();
+	        });
+
+			// タイヤサイズ設定変更のトリガー
 	        $('select[name="tire_variation"]').on('change', cadence_common);
 
-			//
+			// ケイデンス設定変更のトリガー
 	        $('input[name="cadence"]').on('change', cadence_common);
 
-	        //
+	        // チェーンリングの歯数チェックボックス操作のトリガー
 	        $('input.chainwheel-gear-check').on('change', function(){
 		        const check_count = $('input.chainwheel-gear-check:checked').length;
 		        if(check_count < 1 || check_count > 3){
@@ -220,7 +243,7 @@
 			        window.alert("選択数が不正");
 		        }
 
-		        //
+		        // 表計算に必要な配列の初期化
 		        selected_chainwheel_gears.splice(0);
 
 		        const gears = [];
@@ -236,70 +259,91 @@
 		        }
 		        selected_chainwheel_gears.sort((x, y) => x - y);
 
+		        // 表に適用
 		        apply_func();
 	        });
 
-			//
+			// スプロケットの歯数構成セレクトボックス操作のトリガー
             $('select[name="sprocket_variation"]').change(function(){
+				// スプロケットの歯数チェックボックスを一括操作するので一旦禁止に
 				applyable = false;
 
 				const $sprocket_gear_checkbox = $('input.sprocket-gear-check');
 				const val = $(this).find('option:selected').val();
 
-				//
+				// 表計算に必要な配列の初期化
 				selected_sprocket_gears.splice(0);
 
 				if(val !== undefined && val !== ''){
+					// 構成分解
 					const selected_gears = val.split(',');
+					// 定義されている構成数
 					const org_len = selected_gears.length;
 
+					// スプロケットの歯数チェックボックスを初期化
 					$sprocket_gear_checkbox.prop('checked', false);
 
+					// 構成されている歯のチェックボックスをONにする
 					let c = 0;
 					for(const gear of selected_gears.map((v) => parseInt(v))){
 						if(!isNaN(gear)){
+							// チェックON
 							$(`input.sprocket-gear-check[value="${gear}"]`).prop('checked', true);
 
+							// 表計算に必要な配列に追加
 							selected_sprocket_gears.push(gear);
 
+							// 追加分だけインクリメント
 							c++;
                         }
                     }
-
-					if(org_len !== c){
-						$sprocket_gear_checkbox.prop('checked', false);
-                    }
-
+					// 表計算に必要な配列をソート
 					selected_sprocket_gears.sort((x, y) => x - y);
 
+					// (念のため) 構成要素数と配列追加数が合わない場合
+					if(org_len !== c){
+						// スプロケットの歯数チェックボックスを初期化
+						$sprocket_gear_checkbox.prop('checked', false);
+						// 表計算に必要な配列の初期化
+						selected_sprocket_gears.splice(0);
+					}
+
+					// スプロケットの歯数チェックボックスの一括変更を終えたので再度許可
 					applyable = true;
 
+					// 表に適用
                     apply_func();
                 }
             });
 
-			//
+	        // スプロケットの歯数チェックボックス操作のトリガー
 	        $('input.sprocket-gear-check').on('change', function(){
+				// チェック数をカウント
 				const check_count = $('input.sprocket-gear-check:checked').length;
+				// チェック数のバリデーション
 				if(check_count < 1 || check_count > SPROCKET_S_MAX){
 					$(this).prop('checked', (check_count < 1));
 
 					window.alert("選択数が不正");
 				}
 
-				//
+		        // 表計算に必要な配列の初期化
 		        selected_sprocket_gears.splice(0);
 
+				// 連動するスプロケットの歯数構成セレクトボックスの選択状態を解除
 		        $('select[name="sprocket_variation"] option').prop('selected', false);
 
+				// チェックされているギヤ構成を配列化
 		        const gears = [];
 				$('input.sprocket-gear-check:checked').each((idx, elem) => {
 					const int_val = parseInt($(elem).val());
 					if(!isNaN(int_val))
 						gears.push(int_val);
                 });
+				// ソート
 				gears.sort((x, y) => x - y);
 
+				// セレクトボックスのギヤ構成にチェックされているギヤ構成が存在するかチェック
 				let sel_val = '';
 				if(SPROCKET_PRESET[gears.length]){
 					const gears_str = gears.join(',');
@@ -311,33 +355,19 @@
                     }
                 }
 
+				// 選択ギヤ構成がなければ選択肢が「その他」になる
 		        $(`select[name="sprocket_variation"] option[value="${sel_val}"]`).prop('selected', true);
 
-				for(const gear of gears){
+		        // 表計算に必要な配列に追加してソート
+				for(const gear of gears)
 					selected_sprocket_gears.push(gear);
-                }
 		        selected_sprocket_gears.sort((x, y) => x - y);
 
+		        // 表に適用
                 apply_func();
             });
 
-			//
-            $('input[name="mode"]').change(() => {
-				selected_mode = $('input[name="mode"]:checked').val();
-
-				if(selected_mode === 'kph')
-					$('#cadence-field').show(100);
-				else
-					$('#cadence-field').hide(100);
-
-                apply_func();
-            });
-
-			for(const gear of CHAIN_WHEEL_PRESET['2'][0]){
-				selected_chainwheel_gears.push(gear);
-            }
-
-			// 結果表の生成
+			// 結果表のベース生成
 	        {
                 html = '';
 
@@ -366,7 +396,6 @@
 				html += '  <tbody>';
 				for(let i = 1; i <= 3; i++){
 					html += `<tr class="result-row-${i}">`;
-
 					html += `  <th class="cw-${i}">`;
 					html += '    <div class="input-group">';
 					html +=	`      <input type="text" name="cw_tooth_${i}" id="cw-tooth-${i}" class="form-control small text-right input-cw-tooth" readonly />`;
@@ -382,10 +411,10 @@
 						html += '  </div>'
 						html += '</td>';
 					}
-					html += '    </tr>';
+
+					html += '</tr>';
                 }
 				html += '  </tbody>';
-
 				html += '</table>';
 
 				$('div#result-table-field').append(html);
@@ -395,78 +424,81 @@
             $('select[name="tire_variation"]').find('option[data-group="700"][data-width="28c"]').prop('selected', true).change();
 			$('input.chainwheel-gear-check[value="34"]').prop('checked', true);
 			$('input.chainwheel-gear-check[value="50"]').prop('checked', true);
+			$('input.chainwheel-gear-check').change();
 			$('select[name="sprocket_variation"]').find('option[data-group="11"][data-index="2"]').prop('selected', true).change();
 
+			// 計算許可
 	        applyable = true;
 
+	        // 表に適用
 			apply_func();
         })
     </script>
 </head>
 
 <body>
-<div class="container-fluid">
-    <div class="card mt-3 mode-field">
-        <div class="card-header">表示モード</div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="form-check form-check-inline">
-                        <input type="radio" name="mode" value="ratio" id="mode_ratio" class="form-check-input" checked>
-                        <label for="mode_ratio" class="form-check-label">回転比</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input type="radio" name="mode" value="kph" id="mode_kph" class="form-check-input">
-                        <label for="mode_kph" class="form-check-label">速度</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="cadence-field" class="card mt-3" style="display: none;">
-        <div class="card-header">タイヤサイズ・ケイデンス</div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-6">
-                    <label for="tire_variation">タイヤサイズ</label>
-                    <select name="tire_variation" id="tire_variation" class="form-select"></select>
-                </div>
-
-                <div class="col-6">
-                    <label for="cadence">ケイデンス</label>
-                    <div class="input-group">
-                        <input type="number" name="cadence" value="90" min="1" max="255" id="cadence" class="form-control" />
-                        <span class="input-group-text">rpm.</span>
+    <div class="container-fluid">
+        <div id="mode-field" class="card mt-3 mode-field">
+            <div class="card-header">表示モード</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="mode" value="ratio" id="mode_ratio" class="form-check-input" checked>
+                            <label for="mode_ratio" class="form-check-label">回転比</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="mode" value="kph" id="mode_kph" class="form-check-input">
+                            <label for="mode_kph" class="form-check-label">速度</label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="chainwheel-field" class="card mt-3">
-        <div class="card-header">チェーンリング</div>
-        <div class="card-body">
-            <div id="chainwheel-ids" class="mt-2"></div>
-        </div>
-    </div>
+        <div id="cadence-field" class="card mt-3" style="display: none;">
+            <div class="card-header">タイヤサイズ・ケイデンス</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="tire_variation">タイヤサイズ</label>
+                        <select name="tire_variation" id="tire_variation" class="form-select"></select>
+                    </div>
 
-    <div id="sprocket-field" class="card mt-3">
-        <div class="card-header">スプロケット</div>
-        <div class="card-body">
-            <div>
-                <label for="sprocket-variation">歯数構成</label>
-                <select name="sprocket_variation" id="sprocket-variation" class="form-select">
-                    <optgroup label="その他">
-                        <option value="">その他</option>
-                    </optgroup>
-                </select>
+                    <div class="col-6">
+                        <label for="cadence">ケイデンス</label>
+                        <div class="input-group">
+                            <input type="number" name="cadence" value="90" min="1" max="255" id="cadence" class="form-control" />
+                            <span class="input-group-text">rpm.</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="sprocket-ids" class="mt-2"></div>
         </div>
-    </div>
 
-    <div id="result-table-field"></div>
-</div>
+        <div id="chainwheel-field" class="card mt-3">
+            <div class="card-header">チェーンリング</div>
+            <div class="card-body">
+                <div id="chainwheel-ids" class="mt-2"></div>
+            </div>
+        </div>
+
+        <div id="sprocket-field" class="card mt-3">
+            <div class="card-header">スプロケット</div>
+            <div class="card-body">
+                <div>
+                    <label for="sprocket-variation">歯数構成</label>
+                    <select name="sprocket_variation" id="sprocket-variation" class="form-select">
+                        <optgroup label="その他">
+                            <option value="">その他</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div id="sprocket-ids" class="mt-2"></div>
+            </div>
+        </div>
+
+        <div id="result-table-field"></div>
+    </div>
 </body>
 </html>
