@@ -280,7 +280,7 @@ $(() => {
 		if(check_count < 1 || check_count > CHAIN_WHEEL_S_MAX){
 			$(this).prop('checked', (check_count < 1));
 
-			window.alert("選択数が不正");
+			window.alert(`チェーンリングの構成枚数 (チェック数) は 1～${CHAIN_WHEEL_S_MAX} の間にする必要があります。`);
 		}
 
 		// 表計算に必要な配列の初期化
@@ -363,7 +363,7 @@ $(() => {
 		if(check_count < 1 || check_count > SPROCKET_S_MAX){
 			$(this).prop('checked', (check_count < 1));
 
-			window.alert("選択数が不正");
+			window.alert(`スプロケットの構成枚数 (チェック数) は 1～${SPROCKET_S_MAX} の間にする必要があります。`);
 		}
 
 		// 表計算に必要な配列の初期化
