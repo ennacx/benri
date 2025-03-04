@@ -406,7 +406,7 @@ $(() => {
 	});
 
 	// デフォルト値の設定
-	$('select[name="tire_variation"]').find('option[data-group="700"][data-width="28c"]').prop('selected', true).change();
+	$('select[name="tire_variation"]').find('option[data-group="700"][data-width="28C"]').prop('selected', true).change();
 	$('input.chainwheel-gear-check[value="34"]').prop('checked', true);
 	$('input.chainwheel-gear-check[value="50"]').prop('checked', true);
 	$('input.chainwheel-gear-check').change();
