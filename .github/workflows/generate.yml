@@ -1,0 +1,65 @@
+name: Personally useful tools
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+
+    - name: Run main
+      run: |
+        mkdir -p ./dist
+        echo "dist directory made."
+        mkdir -p ./dist/bicycle/css
+        mkdir -p ./dist/bicycle/js
+        echo "bicycle directory made."
+        npm install -g html-minifier
+        html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype ./bicycle/gear-ratio.html -o ./dist/bicycle/gear-ratio.html
+        echo "Installed html-minifier and minimize built HTML."
+        npm install -g uglify-js
+        uglifyjs ./bicycle/js/gear-ratio.js -c -m --output ./dist/bicycle/js/gear-ratio.js
+        uglifyjs ./bicycle/js/preset_sprocket.js -c -m --output ./dist/bicycle/js/preset_sprocket.js
+        uglifyjs ./bicycle/js/preset_tire.js -c -m --output ./dist/bicycle/js/preset_tire.js
+        echo "Installed uglify and minimize built JS."
+        npm install -g clean-css-cli
+        cleancss -o ./dist/bicycle/css/gear-ratio.css ./bicycle/css/gear-ratio.css
+        echo "Installed clean-css-cli and minimize built CSS."
+        cp ./favicon.ico ./dist/
+        echo "Pages copied."
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

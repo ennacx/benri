@@ -114,7 +114,7 @@ $(() => {
 		html += '<table id="result-table" class="table table-bordered">';
 		html += '  <thead>';
 		html += '    <tr>';
-		html += '      <th style="width: 100px;"></th>';
+		html += '      <th class="cw-col"></th>';
 		for(let i = 1; i <= SPROCKET_S_MAX; i++){
 			html += `<th class="result-col-${i}">${i}速</th>`;
 		}
@@ -293,9 +293,8 @@ $(() => {
 		});
 		gears.sort((x, y) => x - y);
 
-		for(const gear of gears){
+		for(const gear of gears)
 			selected_chainwheel_gears.push(gear);
-		}
 		selected_chainwheel_gears.sort((x, y) => x - y);
 
 		// 表に適用

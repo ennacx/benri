@@ -10,6 +10,11 @@ body {
     max-width: 1480px;
   }
 }
+@media (max-width: 1160px) {
+  #result-table-field .input-group-text {
+    display: none;
+  }
+}
 h1 {
   font-size: 1.88rem;
   margin-bottom: 8px;
@@ -20,14 +25,59 @@ h1 a {
   color: black;
 }
 
-#result-table-field {
+footer {
+  text-align: right;
+  font-size: 0.67rem;
+  border-top: 1px solid #eaeaea;
+  background-color: #ffffff;
+  color: #a5a5a5;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 8px 16px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+footer p a {
+  text-decoration: none;
+}
+footer p i {
+  margin-right: 6px;
+}
+footer ul.copy-links {
+  list-style: none;
+}
+footer ul.copy-links li {
+  padding: 0 4px;
+}
+footer ul.copy-links li:not(:last-child) {
+  border-right: 1px solid #a5a5a5;
+}
+footer ul.copy-links li a {
+  text-decoration: none;
+}
+footer ul.copy-links li a:hover {
+  color: #6585ff;
+}
+footer ul.copy-links li i {
+  margin-right: 4px;
+}
+
+#content {
+  padding-bottom: 52px !important;
+}
+#content #result-table-field {
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
-#result-table-field #result-table {
+#content #result-table-field #result-table {
   margin-bottom: 0;
 }
-#result-table-field .result-legend {
+#content #result-table-field #result-table .cw-col {
+  width: 8%;
+}
+#content #result-table-field .result-legend {
   font-size: 0.75rem;
   font-weight: bold;
   color: #d53322;
