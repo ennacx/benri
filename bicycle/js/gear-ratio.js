@@ -115,7 +115,8 @@ $(() => {
 		html += '  <thead>';
 		html += '    <tr>';
 		html += '      <th class="cw-col"></th>';
-		for(let i = 1; i <= SPROCKET_S_MAX; i++){
+		for(let i = SPROCKET_S_MAX; i >= 1; i--){
+			// FIXME: 他とクラスが逆順になるが表示等の制御上は問題ない (気持ち悪いけど)
 			html += `<th class="result-col-${i}">${i}速</th>`;
 		}
 		html += '    </tr>';
