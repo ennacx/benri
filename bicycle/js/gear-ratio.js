@@ -4,6 +4,9 @@ $(() => {
 	// タイヤサイズプリセット
 	const TIRE_PRESET = window.TIRE_PRESET;
 
+	// チェーンリング 最大歯数構成数
+	const CHAIN_WHEEL_S_MAX = 3;
+
 	// スプロケット 最小歯数構成数 / 最大歯数構成数
 	const SPROCKET_S_MIN = Math.min(...Object.keys(SPROCKET_PRESET).map((v) => parseInt(v)));
 	const SPROCKET_S_MAX = Math.max(...Object.keys(SPROCKET_PRESET).map((v) => parseInt(v)));
@@ -104,6 +107,59 @@ $(() => {
 		$sprocket_field.find('#sprocket-ids').append(html);
 	}
 
+	// 結果表のベース生成
+	{
+		html = '';
+
+		html += '<table id="result-table" class="table table-bordered">';
+		html += '  <thead>';
+		html += '    <tr>';
+		html += '      <th style="width: 100px;"></th>';
+		for(let i = 1; i <= SPROCKET_S_MAX; i++){
+			html += `<th class="result-col-${i}">${i}速</th>`;
+		}
+		html += '    </tr>';
+
+		html += '    <tr>';
+		html += '      <th></th>';
+		for(let i = 1; i <= SPROCKET_S_MAX; i++){
+			html += `<th class="result-col-${i}">`;
+			html += '  <div class="input-group">';
+			html +=	`    <input type="text" name="sp_tooth_${i}" id="sp-tooth-${i}" class="form-control small text-right input-sp-tooth" readonly />`;
+			html += '    <span class="input-group-text s-unit">T</span>';
+			html += '  </div>'
+			html += '</th>';
+		}
+		html += '    </tr>';
+		html += '  </thead>';
+
+		html += '  <tbody>';
+		for(let i = 1; i <= CHAIN_WHEEL_S_MAX; i++){
+			html += `<tr class="result-row-${i}">`;
+			html += `  <th class="cw-${i}">`;
+			html += '    <div class="input-group">';
+			html +=	`      <input type="text" name="cw_tooth_${i}" id="cw-tooth-${i}" class="form-control small text-right input-cw-tooth" readonly />`;
+			html += '      <span class="input-group-text s-unit">T</span>';
+			html += '    </div>'
+			html += '  </th>';
+
+			for(let j = 1; j <= SPROCKET_S_MAX; j++){
+				html += `<td class="result-col-${j}">`;
+				// html += '  <div class="input-group">';
+				html +=	`    <input type="text" name="result_${i}_${j}" id="result-${i}-${j}" class="form-control small text-right input-result" readonly />`;
+				// html += '    <span class="input-group-text result-unit"></span>';
+				// html += '  </div>'
+				html += '</td>';
+			}
+
+			html += '</tr>';
+		}
+		html += '  </tbody>';
+		html += '</table>';
+
+		$('div#result-table-field').prepend(html);
+	}
+
 	/**
 	 * 設定値から計算、表に反映するサブファンクション
 	 */
@@ -195,10 +251,17 @@ $(() => {
 	$('input[name="mode"]').change(() => {
 		selected_mode = $('input[name="mode"]:checked').val();
 
-		if(selected_mode === 'kph')
+		if(selected_mode === 'kph'){
 			$('#cadence-field').show(100);
-		else
+
+			$('.ratio-legend').hide();
+			$('.kph-legend').show();
+		} else{
 			$('#cadence-field').hide(100);
+
+			$('.kph-legend').hide();
+			$('.ratio-legend').show();
+		}
 
 		// 表に適用
 		apply_func();
@@ -213,7 +276,7 @@ $(() => {
 	// チェーンリングの歯数チェックボックス操作のトリガー
 	$('input.chainwheel-gear-check').on('change', function(){
 		const check_count = $('input.chainwheel-gear-check:checked').length;
-		if(check_count < 1 || check_count > 3){
+		if(check_count < 1 || check_count > CHAIN_WHEEL_S_MAX){
 			$(this).prop('checked', (check_count < 1));
 
 			window.alert("選択数が不正");
@@ -342,59 +405,6 @@ $(() => {
 		// 表に適用
 		apply_func();
 	});
-
-	// 結果表のベース生成
-	{
-		html = '';
-
-		html += '<table class="table">';
-		html += '  <thead>';
-		html += '    <tr>';
-		html += '      <th style="width: 100px;"></th>';
-		for(let i = 1; i <= SPROCKET_S_MAX; i++){
-			html += `<th class="result-col-${i}">${i}速</th>`;
-		}
-		html += '    </tr>';
-
-		html += '    <tr>';
-		html += '      <th></th>';
-		for(let i = 1; i <= SPROCKET_S_MAX; i++){
-			html += `<th class="result-col-${i}">`;
-			html += '  <div class="input-group">';
-			html +=	`    <input type="text" name="sp_tooth_${i}" id="sp-tooth-${i}" class="form-control small text-right input-sp-tooth" readonly />`;
-			html += '    <span class="input-group-text s-unit">T</span>';
-			html += '  </div>'
-			html += '</th>';
-		}
-		html += '    </tr>';
-		html += '  </thead>';
-
-		html += '  <tbody>';
-		for(let i = 1; i <= 3; i++){
-			html += `<tr class="result-row-${i}">`;
-			html += `  <th class="cw-${i}">`;
-			html += '    <div class="input-group">';
-			html +=	`      <input type="text" name="cw_tooth_${i}" id="cw-tooth-${i}" class="form-control small text-right input-cw-tooth" readonly />`;
-			html += '      <span class="input-group-text s-unit">T</span>';
-			html += '    </div>'
-			html += '  </th>';
-
-			for(let j = 1; j <= SPROCKET_S_MAX; j++){
-				html += `<td class="result-col-${j}">`;
-				html += '  <div class="input-group">';
-				html +=	`    <input type="text" name="result_${i}_${j}" id="result-${i}-${j}" class="form-control small text-right input-result" readonly />`;
-				html += '    <span class="input-group-text result-unit"></span>';
-				html += '  </div>'
-				html += '</td>';
-			}
-
-			html += '</tr>';
-		}
-		html += '  </tbody>';
-		html += '</table>';
-
-		$('div#result-table-field').append(html);
-	}
 
 	// デフォルト値の設定
 	$('select[name="tire_variation"]').find('option[data-group="700"][data-width="28c"]').prop('selected', true).change();
