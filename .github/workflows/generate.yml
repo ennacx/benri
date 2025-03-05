@@ -50,7 +50,6 @@ jobs:
 
     - name: CSS minifier
       run: |
-        cleancss -o ./dist/css/base.css ./css/base.css
         cleancss -o ./dist/css/index.css ./css/index.css
         cleancss -o ./dist/bicycle/css/gear-ratio.css ./bicycle/css/gear-ratio.css
 
