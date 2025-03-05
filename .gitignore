@@ -1,3 +1,5 @@
 .idea/
+/css/_base.css
+/css/_base.css.map
 /dist/
 /vendor/
