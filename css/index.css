@@ -62,8 +62,21 @@ footer ul.copy-links li i {
   text-align: right !important;
 }
 
+@media (min-width: 719.98px) {
+  body {
+    max-width: 720px;
+  }
+}
+h2 {
+  font-size: 1.2rem;
+}
+
 li ul li {
   list-style: none;
+}
+
+#menu-list {
+  margin-top: 16px;
 }
 
 /*# sourceMappingURL=index.css.map */
