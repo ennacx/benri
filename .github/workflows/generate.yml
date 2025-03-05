@@ -27,6 +27,7 @@ jobs:
     - name: Run main
       run: |
         mkdir -p ./dist
+        mkdir -p ./dist/css
         echo "dist directory made."
         mkdir -p ./dist/bicycle/css
         mkdir -p ./dist/bicycle/js
@@ -41,6 +42,8 @@ jobs:
         uglifyjs ./bicycle/js/preset_tire.js -c -m --output ./dist/bicycle/js/preset_tire.js
         echo "Installed uglify and minimize built JS."
         npm install -g clean-css-cli
+        cleancss -o ./dist/css/base.css ./css/base.css
+        cleancss -o ./dist/css/index.css ./css/index.css
         cleancss -o ./dist/bicycle/css/gear-ratio.css ./bicycle/css/gear-ratio.css
         echo "Installed clean-css-cli and minimize built CSS."
         cp ./favicon.ico ./dist/
