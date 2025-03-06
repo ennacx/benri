@@ -67,19 +67,17 @@ footer ul.copy-links li i {
     max-width: 800px;
   }
 }
-h2 {
+#content #menu-list {
+  margin-top: 16px;
+}
+#content #menu-list h2 {
   font-size: 1.2rem;
 }
-
-li:not(:first-child) {
+#content #menu-list li:not(:first-child) {
   margin-top: 12px;
 }
-li ul li {
+#content #menu-list li ul li {
   list-style: none;
-}
-
-#menu-list {
-  margin-top: 16px;
 }
 
 /*# sourceMappingURL=index.css.map */
