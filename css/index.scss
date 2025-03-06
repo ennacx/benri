@@ -1,8 +1,8 @@
 @use "base";
 
-@media (min-width: 719.98px) {
+@media (min-width: 799.98px) {
 	body {
-		max-width: 720px;
+		max-width: 800px;
 	}
 }
 
@@ -11,6 +11,10 @@ h2 {
 }
 
 li {
+	&:not(:first-child) {
+		margin-top: 12px;
+	}
+
 	& ul li {
 		list-style: none;
 	}
