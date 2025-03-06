@@ -408,14 +408,27 @@ $(() => {
 
 	// スプロケットの歯数チェックボックス解除ボタンクリック
 	$('button[name="sprocket_clear"]').click(() => {
+		// スプロケットの歯数チェックボックスを一括操作するので一旦禁止に
+		applyable = false;
+
+		// 表計算に必要な配列の初期化
+		selected_sprocket_gears.splice(0);
+
 		const check_val = [];
 		$('input.sprocket-gear-check:checked').each((idx, elem) => {
 			check_val.push(parseInt($(elem).val()));
 		});
 		const min_val = Math.min(...check_val);
 
+		selected_sprocket_gears.push(min_val);
+
 		$(`input.sprocket-gear-check:checked:not([value="${min_val}"])`).prop('checked', false);
-		$('input.sprocket-gear-check').change();
+
+		// スプロケットの歯数チェックボックスの一括変更を終えたので再度許可
+		applyable = true;
+
+		// 表に適用
+		apply_func();
 	});
 
 	// デフォルト値の設定
