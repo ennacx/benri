@@ -76,6 +76,21 @@ hr {
   margin-top: 1.5rem;
 }
 
+#content .card .card-header h3 {
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: normal;
+}
+#content #sprocket-field button {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+}
+#content #sprocket-field button.btn-sm {
+  --bs-btn-padding-y: 0.125rem;
+  --bs-btn-padding-x: 0.5rem;
+  --bs-btn-font-size: 0.75rem;
+}
 #content #result-table-field {
   margin-top: 1.5rem;
   margin-bottom: 1rem;

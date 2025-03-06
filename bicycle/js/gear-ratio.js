@@ -406,6 +406,18 @@ $(() => {
 		apply_func();
 	});
 
+	// スプロケットの歯数チェックボックス解除ボタンクリック
+	$('button[name="sprocket_clear"]').click(() => {
+		const check_val = [];
+		$('input.sprocket-gear-check:checked').each((idx, elem) => {
+			check_val.push(parseInt($(elem).val()));
+		});
+		const min_val = Math.min(...check_val);
+
+		$(`input.sprocket-gear-check:checked:not([value="${min_val}"])`).prop('checked', false);
+		$('input.sprocket-gear-check').change();
+	});
+
 	// デフォルト値の設定
 	$('select[name="tire_variation"]').find('option[data-group="700"][data-width="28C"]').prop('selected', true).change();
 	$('input.chainwheel-gear-check[value="34"]').prop('checked', true);
