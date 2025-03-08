@@ -21,9 +21,8 @@ const rad2deg = (rad) => rad * (180 / Math.PI);
  * @param {number} opposite
  * @returns {number}
  */
-const getAdjacentFromDegreeAndOpposite = (degree, opposite) => {
-	return opposite / Math.tan(degree);
-};
+const getAdjacentFromDegreeAndOpposite = (degree, opposite) =>
+	opposite / Math.tan(deg2rad(degree));
 
 /**
  * 角度と高さから斜辺を計算
@@ -32,9 +31,8 @@ const getAdjacentFromDegreeAndOpposite = (degree, opposite) => {
  * @param {number} opposite
  * @returns {number}
  */
-const getHypotenuseFromDegreeAndOpposite = (degree, opposite) => {
-	return opposite / Math.sin(degree);
-};
+const getHypotenuseFromDegreeAndOpposite = (degree, opposite) =>
+	opposite / Math.sin(deg2rad(degree));
 
 /**
  * 角度と斜辺から底辺を計算
@@ -43,9 +41,8 @@ const getHypotenuseFromDegreeAndOpposite = (degree, opposite) => {
  * @param {number} hypotenuse
  * @returns {number}
  */
-const getAdjacentFromDegreeAndHypotenuse = (degree, hypotenuse) => {
-	return hypotenuse * Math.cos(degree);
-};
+const getAdjacentFromDegreeAndHypotenuse = (degree, hypotenuse) =>
+	hypotenuse * Math.cos(deg2rad(degree));
 
 /**
  * 角度と底辺から高さを計算
@@ -54,9 +51,8 @@ const getAdjacentFromDegreeAndHypotenuse = (degree, hypotenuse) => {
  * @param {number} adjacent
  * @returns {number}
  */
-const getOppositeFromDegreeAndAdjacent = (degree, adjacent) => {
-	return adjacent * Math.tan(degree);
-};
+const getOppositeFromDegreeAndAdjacent = (degree, adjacent) =>
+	adjacent * Math.tan(deg2rad(degree));
 
 /**
  * 角度と斜辺から高さを計算
@@ -65,9 +61,8 @@ const getOppositeFromDegreeAndAdjacent = (degree, adjacent) => {
  * @param {number} hypotenuse
  * @returns {number}
  */
-const getOppositeFromDegreeAndHypotenuse = (degree, hypotenuse) => {
-	return hypotenuse * Math.sin(degree);
-};
+const getOppositeFromDegreeAndHypotenuse = (degree, hypotenuse) =>
+	hypotenuse * Math.sin(deg2rad(degree));
 
 /**
  * 角度と底辺から斜辺を計算
@@ -76,9 +71,8 @@ const getOppositeFromDegreeAndHypotenuse = (degree, hypotenuse) => {
  * @param {number} adjacent
  * @returns {number}
  */
-const getHypotenuseFromDegreeAndAdjacent = (degree, adjacent) => {
-	return adjacent / Math.cos(degree);
-};
+const getHypotenuseFromDegreeAndAdjacent = (degree, adjacent) =>
+	adjacent / Math.cos(deg2rad(degree));
 
 /**
  * 底辺と高さから角度を計算
@@ -100,9 +94,8 @@ const getDegreeFromAdjacentAndOpposite = (adjacent, opposite, degree = true) => 
  * @param {number} opposite
  * @returns {number}
  */
-const getHypotenuseFromAdjacentAndOpposite = (adjacent, opposite) => {
-	return Math.sqrt(adjacent ** 2 + opposite ** 2);
-};
+const getHypotenuseFromAdjacentAndOpposite = (adjacent, opposite) =>
+	Math.sqrt(adjacent ** 2 + opposite ** 2);
 
 /**
  * 底辺と斜辺から角度を計算
@@ -124,9 +117,8 @@ const getDegreeFromAdjacentAndHypotenuse = (adjacent, hypotenuse, degree = true)
  * @param {number} hypotenuse
  * @returns {number}
  */
-const getOppositeFromAdjacentAndHypotenuse = (adjacent, hypotenuse) => {
-	return Math.sqrt(hypotenuse ** 2 - adjacent ** 2);
-};
+const getOppositeFromAdjacentAndHypotenuse = (adjacent, hypotenuse) =>
+	Math.sqrt(hypotenuse ** 2 - adjacent ** 2);
 
 /**
  * 高さと斜辺から角度を計算
@@ -148,9 +140,8 @@ const getDegreeFromOppositeAndHypotenuse = (opposite, hypotenuse, degree = true)
  * @param {number} hypotenuse
  * @returns {number}
  */
-const getAdjacentFromOppositeAndHypotenuse = (opposite, hypotenuse) => {
-	return Math.sqrt(hypotenuse ** 2 - opposite ** 2);
-};
+const getAdjacentFromOppositeAndHypotenuse = (opposite, hypotenuse) =>
+	Math.sqrt(hypotenuse ** 2 - opposite ** 2);
 
 /**
  * 三角形の三辺から高さや3つの角度を計算 (
@@ -158,44 +149,45 @@ const getAdjacentFromOppositeAndHypotenuse = (opposite, hypotenuse) => {
  * @param {number} a
  * @param {number} b
  * @param {number} c
- * @returns {{a: number, b: number, c: number, degAB: number, degBC: number, h: number, degAC: number}|null}
+ * @param {boolean} strict
+ * @returns {{a: number, b: number, c: number, h: number, deg_ab: number, deg_ac: number, deg_bc: number}|null}
  */
-const getTriangleDetailFromThreeSides = (a, b, c) => {
+const getTriangleDetailFromThreeSides = (a, b, c, strict = false) => {
 
 	const s = (a + b + c) / 2;
 	const S = Math.sqrt(s * (s - a) * (s - b) * (s - c));
 
-	let h, degAB, degAC, degBC;
+	let h, deg_ab, deg_ac, deg_bc, buff1, buff2;
 
 	if(a >= b && a >= c){
-		if(a !== Math.sqrt(b ** 2 + c ** 2))
+		if(strict && a !== Math.sqrt(b ** 2 + c ** 2))
 			return null;
 
 		h = 2 * S / a;
-		degAB = Math.asin(h / b);
-		degAC = Math.asin(h / c);
-		degBC = 180 - degAB - degAC;
+		deg_ab = rad2deg(Math.asin(h / b));
+		deg_ac = rad2deg(Math.asin(h / c));
+		deg_bc = 180 - deg_ab - deg_ac;
 	} else if(b >= a && b >= c){
-		if(b !== Math.sqrt(a ** 2 + c ** 2))
+		if(strict && b !== Math.sqrt(a ** 2 + c ** 2))
 			return null;
 
 		h = 2 * S / b;
-		degAB = Math.asin(h / a);
-		degBC = Math.asin(h / c);
-		degAC = 180 - degAB - degBC;
-	} else if(c >= a && c >= b){
+		deg_ab = rad2deg(Math.asin(h / a));
+		deg_bc = rad2deg(Math.asin(h / c));
+		deg_ac = 180 - deg_ab - deg_bc;
+	} else if(strict && c >= a && c >= b){
 		if(c !== Math.sqrt(b ** 2 + c ** 2))
 			return null;
 
 		h = 2 * S / c;
-		degAC = Math.asin(h / a);
-		degBC = Math.asin(h / b);
-		degAB = 180 - degAC - degBC;
+		deg_ac = rad2deg(Math.asin(h / a));
+		deg_bc = rad2deg(Math.asin(h / b));
+		deg_ab = 180 - deg_ac - deg_bc;
 	} else{
 		return null;
 	}
 
-	if(isNaN(degAB) || isNaN(degAC) || isNaN(degBC))
+	if(isNaN(deg_ab) || isNaN(deg_ac) || isNaN(deg_bc))
 		return null;
 
 	return {
@@ -203,8 +195,8 @@ const getTriangleDetailFromThreeSides = (a, b, c) => {
 		'b': b,
 		'c': c,
 		'h': h,
-		'degAB': degAB,
-		'degAC': degAC,
-		'degBC': degBC
+		'deg_ab': deg_ab,
+		'deg_ac': deg_ac,
+		'deg_bc': deg_bc
 	};
 };
